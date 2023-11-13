@@ -34,9 +34,9 @@
 
     <script>
       setInterval(function() {
-        getNoisture();
+        getMoisture();
       }, 1000);
-      function getNoisture() {
+      function getMoisture() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
