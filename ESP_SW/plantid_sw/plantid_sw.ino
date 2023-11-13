@@ -3,30 +3,29 @@
 #include <SPIFFS.h>
 #include <ESPAsyncWebSrv.h>
 
+#define moisturePIN 34
+#define temperaturePIN 35
+
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
 const char* ssid = "LifanHome";
 const char* password = "nexapote2620!";
 
+float moisture = 0;
+float temperature = 0;
+
 void notFound(AsyncWebServerRequest *request) {
     request->send(404, "text/plain", "Not found");
 }
 
-#define moisturePIN 34
-#define temperaturePIN 35
-
-int moisture = 0;
-int temperature = 0;
-
-
 String readMoisture() {
-  moisture = analogRead(moisturePIN);
-  moisture = (moisture / 3) * 50; //converting incoming voltage value in %
+  double voltage = (analogRead(moisturePIN)*3.3)/1024;
+  moisture = (voltage / 3) * 50; //converting incoming voltage value in %
   String moistureVal = String(moisture);
   Serial.println("Int: " + moisture);
   Serial.println("String: " + moistureVal);
-  if (moisture == 0) {
+  if (isnan(moisture)) {
     Serial.println("Could not read any moisture value!");
     return "";
   } else {
@@ -35,12 +34,12 @@ String readMoisture() {
 }
 
 String readTemperature() {
-  temperature = analogRead(temperaturePIN);
-  temperature = (temperature - 0.5) / (0.01); //converting incoming voltage value in °C
+  double voltage = (analogRead(temperaturePIN)*3.3)/1024;
+  temperature = (voltage - 0.5) / (0.01); //converting incoming voltage value in °C
   String temperatureVal = String(temperature);
   Serial.println("Int: " + temperature);
   Serial.println("String: " + temperatureVal);
-  if (temperature == 0) {
+  if (isnan(temperature)) {
     Serial.println("Could not read any temperature value!");
     return "";
   } else {
