@@ -1,2 +1,0 @@
-# Plantid
-Smart Watering
