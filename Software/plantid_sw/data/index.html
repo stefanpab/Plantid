@@ -1,0 +1,65 @@
+<!DOCTYPE HTML><html>
+<head>
+  <title>Plantid</title>
+  <meta http-equiv='content-type' content='text/html'; charset='utf-8'>
+  <style>
+    body {
+      background-color: #c2c2c2;
+    }
+
+    .box {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      border-radius: 20px;
+      border-color: black;
+      border-style: dashed;
+    }
+  </style>
+</head>
+<body>
+  <h2>Plantid</h2>
+  <div class="box">
+    <div id="chart-temperature">
+      <label>Moisture: </label>
+      <span id='moistureValue'></span>%
+    </div>
+    <div id="chart-temperature">
+      <label>Temperature: </label>
+      <span id='temperatureValue'></span>°C
+    </div>
+  </div>
+
+    <script>
+      setInterval(function() {
+        getMoisture();
+      }, 1000);
+      function getMoisture() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            document.getElementById('moistureValue').innerHTML = this.responseText;
+          }
+        };
+        xhttp.open('GET', 'moisture', true);
+        xhttp.send();
+      }
+
+      setInterval(function() {
+        getTemperature();
+      }, 1000);
+      function getTemperature() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            document.getElementById('temperatureValue').innerHTML = this.responseText;
+          }
+        };
+        xhttp.open('GET', 'temperature', true);
+        xhttp.send();
+      }
+    </script>
+</body>
+</html>
