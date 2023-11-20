@@ -9,7 +9,7 @@
 
     .box {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       width: 100%;
@@ -22,20 +22,24 @@
 <body>
   <h2>Plantid</h2>
   <div class="box">
-    <div id="chart-temperature">
+    <div>
       <label>Moisture: </label>
       <span id='moistureValue'></span>%
     </div>
-    <div id="chart-temperature">
+    <div>
       <label>Temperature: </label>
       <span id='temperatureValue'></span>°C
+    </div>
+    <div>
+      <label>Pump State: </label>
+      <span id='stateValue'></span>
     </div>
   </div>
 
     <script>
       setInterval(function() {
         getMoisture();
-      }, 1000);
+      }, 10000);
       function getMoisture() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -49,7 +53,7 @@
 
       setInterval(function() {
         getTemperature();
-      }, 1000);
+      }, 10000);
       function getTemperature() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -58,6 +62,20 @@
           }
         };
         xhttp.open('GET', 'temperature', true);
+        xhttp.send();
+      }
+
+      setInterval(function() {
+        getState();
+      }, 10000);
+      function getState() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            document.getElementById('stateValue').innerHTML = this.responseText;
+          }
+        };
+        xhttp.open('GET', 'pumpState', true);
         xhttp.send();
       }
     </script>

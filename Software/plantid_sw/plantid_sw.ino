@@ -8,6 +8,7 @@
 #define temperaturePIN 35
 #define pumpPIN 25
 #define pause 10000
+#define threshold 25.0
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -21,7 +22,11 @@ float temperature = 0;
 bool state = false;
 
 void notFound(AsyncWebServerRequest *request) {
-    request->send(404, "text/plain", "Not found");
+  if((SPIFFS.exists("index.html"))) {
+    request->send(SPIFFS, "/index.html");
+  } else {
+    request->send(404, "text/plain", "Not found"); 
+  }
 }
 
 String readMoisture() {
@@ -60,14 +65,25 @@ String readTemp() {
   }
 }
 
+String readState() {
+  String pumpState;
+  if(state = true) {
+    pumpState = "Pump active";
+  } else {
+    pumpState = "Pump inactive";
+  }
+}
+
 void startPump() {
   digitalWrite(pumpPIN, LOW);
-  if(moisture <= 25.0) {
+  if(moisture <= threshold) {
     Serial.println("Pump starts watering!");
     digitalWrite(pumpPIN, HIGH);
+    state = true;
     delay(pause);
     Serial.println("Pump finished watering!");
     digitalWrite(pumpPIN, LOW);
+    state = false;
   }
 }
 
@@ -110,6 +126,10 @@ void setup() {
   
   server.on("/moisture", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", readMoisture().c_str());
+  });
+
+  server.on("/pumpState", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", readState().c_str());
   });
 
   // if no server is found
