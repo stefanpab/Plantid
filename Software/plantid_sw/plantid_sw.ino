@@ -29,7 +29,7 @@ void notFound(AsyncWebServerRequest *request) {
   String file = url.substring(slashPos + 1);
   
   if((SPIFFS.exists(file))) {
-    request->send(SPIFFS, "/index.html");
+    request->send(SPIFFS, "/index.html"); 
   } else {
     request->send(404, "text/plain", "Not found"); 
   }
