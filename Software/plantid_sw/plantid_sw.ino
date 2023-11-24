@@ -2,13 +2,17 @@
 #include <AsyncTCP.h>
 #include <SPIFFS.h>
 #include <ESPAsyncWebSrv.h>
-#include <ArduinoOTA.h>
 
 #define moisturePIN 34
 #define temperaturePIN 35
 #define pumpPIN 25
 #define pause 10000
 #define threshold 25.0
+#define uS_to_S 1000000
+#define sleeptime 10
+
+RTC_DATA_ATTR int dayboots = 0;
+RTC_DATA_ATTR bool state = false;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -18,8 +22,6 @@ const char* password = "nexapote2620!";
 
 float moisture = 0;
 float temperature = 0;
-
-bool state = false;
 
 void notFound(AsyncWebServerRequest *request) {
   String url = request->url();
@@ -80,7 +82,7 @@ String readState() {
 
 void startPump() {
   digitalWrite(pumpPIN, LOW);
-  if(moisture <= threshold) {
+  if(moisture <= threshold && dayboots >= 8640) { //8640 boots is one day (24h)
     Serial.println("Pump starts watering!");
     digitalWrite(pumpPIN, HIGH);
     state = true;
@@ -88,10 +90,17 @@ void startPump() {
     Serial.println("Pump finished watering!");
     digitalWrite(pumpPIN, LOW);
     state = false;
+    dayboots = 0;
   }
 }
 
 void setup() {
+  //Increment after every boot
+  ++dayboots;
+
+  //wakeup every 10 seconds
+  esp_sleep_enable_timer_wakeup(sleeptime * uS_to_S); 
+  
   // Serial port for debugging
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
@@ -102,12 +111,7 @@ void setup() {
     delay(1000);
     Serial.println("Connecting to WiFi..");
   }
-
-  ArduinoOTA.setHostname("plantid");
-  ArduinoOTA.setPassword("admin");
-
-  ArduinoOTA.begin();
-
+  
   // Print ESP32 Local IP Address
   Serial.print("Local IP of ESP32: ");
   Serial.println(WiFi.localIP());
@@ -141,8 +145,10 @@ void setup() {
 
   // Start server
   server.begin();
+
+  //go to sleep
+  esp_deep_sleep_start();
 }
 
 void loop() {
-  ArduinoOTA.handle();
 }
