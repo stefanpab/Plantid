@@ -38,7 +38,7 @@
     </div>
     <div>
       <label>Pump State: </label>
-      <span id='stateValue'></span>
+      <span id='pumpStateValue'></span>
     </div>
   </div>
 
@@ -72,13 +72,13 @@
       }
 
       setInterval(function() {
-        getState();
+        getPumpState();
       }, 10000);
-      function getState() {
+      function getPumpState() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
-            document.getElementById('stateValue').innerHTML = this.responseText;
+            document.getElementById('pumpStateValue').innerHTML = this.responseText;
           }
         };
         xhttp.open('GET', 'pumpState', true);

@@ -2,6 +2,7 @@
 #include <AsyncTCP.h>
 #include <SPIFFS.h>
 #include <ESPAsyncWebSrv.h>
+#include <ESP32Time.h>
 
 #define moisturePIN 34
 #define temperaturePIN 35
@@ -11,11 +12,16 @@
 #define uS_to_S 1000000
 #define sleeptime 10
 
-RTC_DATA_ATTR int dayboots = 0;
-RTC_DATA_ATTR bool state = false;
+RTC_DATA_ATTR uint8_t = currentDay = 0;
+
+bool isNewDay = false;
+bool currentPumpState = false;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
+
+//ESP32Time rtc;
+ESP32Time rtc(3600);  // offset in seconds GMT+1
 
 const char* ssid = "LifanHome";
 const char* password = "nexapote2620!";
@@ -29,9 +35,18 @@ void notFound(AsyncWebServerRequest *request) {
   String file = url.substring(slashPos + 1);
   
   if((SPIFFS.exists(file))) {
-    request->send(SPIFFS, "/index.html"); 
+    request->send(SPIFFS, file); 
   } else {
     request->send(404, "text/plain", "Not found"); 
+  }
+}
+
+void getCurrentDay() {
+  int day = rtc.getDay();
+  if(hour =! currentDay) {
+    isNewDay = true;
+  } else {
+    isNewDay = false;
   }
 }
 
@@ -71,33 +86,30 @@ String readTemp() {
   }
 }
 
-String readState() {
-  String pumpState;
-  if(state = true) {
-    pumpState = "Pump active";
+String readPumpState() {
+  String pumpcurrentPumpState;
+  if(currentPumpState = true) {
+    pumpcurrentPumpState = "Pump active";
   } else {
-    pumpState = "Pump inactive";
+    pumpcurrentPumpState = "Pump inactive";
   }
 }
 
 void startPump() {
   digitalWrite(pumpPIN, LOW);
-  if(moisture <= threshold && dayboots >= 8640) { //8640 boots is one day (24h)
+  if(moisture <= threshold && isNewDay == true) {
+    currentDay = rtc.getDay(); 
     Serial.println("Pump starts watering!");
     digitalWrite(pumpPIN, HIGH);
-    state = true;
+    currentPumpState = true;
     delay(pause);
     Serial.println("Pump finished watering!");
     digitalWrite(pumpPIN, LOW);
-    state = false;
-    dayboots = 0;
+    currentPumpState = false;
   }
 }
 
 void setup() {
-  //Increment after every boot
-  ++dayboots;
-
   //wakeup every 10 seconds
   esp_sleep_enable_timer_wakeup(sleeptime * uS_to_S); 
   
@@ -123,6 +135,8 @@ void setup() {
   pinMode(temperaturePIN, INPUT);
   pinMode(pumpPIN, OUTPUT);
 
+  getCurrentDay();
+
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/index.html");
@@ -137,7 +151,7 @@ void setup() {
   });
 
   server.on("/pumpState", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", readState().c_str());
+    request->send_P(200, "text/plain", readPumpState().c_str());
   });
 
   // if no server is found
