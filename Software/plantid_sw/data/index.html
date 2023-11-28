@@ -4,18 +4,72 @@
   <meta http-equiv='content-type' content='text/html'; charset='utf-8'>
   <style>
     body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
       background-color: #c2c2c2;
+      background-size: cover;
+    }
+
+    .bodyBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: row;
     }
 
     .box {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 20%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 10px;
+      width: 200px;
+      text-align: center;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+
+    .box2 {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 10px;
+      width: 200px;
+      text-align: center;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+
+    .box:hover {
+      transform: scale(1.05);
+    }
+
+    .submitBtn {
       border-radius: 20px;
+      background-color: white;
+      width: 35%;
+      height: 20%;
       border-color: black;
-      border-style: dashed;
+      transition: transform 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .submitBtn:hover {
+      transform: scale(1.05);
+    }
+
+    .textInputWaterTime {
+      border-radius: 5px;
+      background-color: white;
+      width: 80%;
+      height: 25%;
+      border-color: black;
+      transition: transform 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
 
     h1 {
@@ -27,20 +81,31 @@
 </head>
 <body>
   <h1>Plantid</h2>
-  <div class="box">
-    <div>
-      <label>Moisture: </label>
-      <span id='moistureValue'></span>%
+    <div class="bodyBox">
+      <div class="box">
+        <label>Moisture: </label>
+        <span id='moistureValue'></span>%
+      </div>
+      <div class="box">
+        <label>Temperature: </label>
+        <span id='temperatureValue'></span>°C
+      </div>
+      <div class="box">
+        <label>Pump State: </label>
+        <span id='pumpStateValue'></span>
+      </div>
     </div>
-    <div>
-      <label>Temperature: </label>
-      <span id='temperatureValue'></span>°C
+    <div class="box2">
+      <h2>Change Watering Time:</h2>
+      <form action="/config" method="post">
+        <input type="text" class="textInputWaterTime" id="wateringTime" name="wateringTime" placeholder="Enter watering time (ms)" pattern="[5-9]\d{3}|100000">
+        <br>
+        <span class="error-message" id="errorMessage"></span>
+        <br>
+        <input class="submitBtn" type="submit" value="Save" onclick="validateInput()">
+      </form>
     </div>
-    <div>
-      <label>Pump State: </label>
-      <span id='pumpStateValue'></span>
-    </div>
-  </div>
+
 
     <script>
       setInterval(function() {
@@ -84,6 +149,17 @@
         xhttp.open('GET', 'pumpState', true);
         xhttp.send();
       }
+
+      function validateInput() {
+            var inputElement = document.getElementById("wateringTime");
+            var errorMessageElement = document.getElementById("errorMessage");
+
+            if (inputElement.checkValidity()) {
+                errorMessageElement.innerText = "";
+            } else {
+                errorMessageElement.innerText = "Please enter a number between 5.000 and 100.000!";
+            }
+        }
     </script>
 </body>
 </html>

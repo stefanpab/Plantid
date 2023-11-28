@@ -3,11 +3,12 @@
 #include <SPIFFS.h>
 #include <ESPAsyncWebSrv.h>
 #include <ESP32Time.h>
+#include <Preferences.h>
 
 #define moisturePIN 34
 #define temperaturePIN 35
 #define pumpPIN 25
-#define pause 10000
+#define wateringTime 10000
 #define threshold 25.0
 #define uS_to_S 1000000
 #define sleeptime 10
@@ -22,6 +23,8 @@ AsyncWebServer server(80);
 
 //ESP32Time rtc;
 ESP32Time rtc(3600);  // offset in seconds GMT+1
+
+Preferences preferences;
 
 const char* ssid = "LifanHome";
 const char* password = "nexapote2620!";
@@ -102,7 +105,7 @@ void startPump() {
     Serial.println("Pump starts watering!");
     digitalWrite(pumpPIN, HIGH);
     currentPumpState = true;
-    delay(pause);
+    delay(wateringTime);
     Serial.println("Pump finished watering!");
     digitalWrite(pumpPIN, LOW);
     currentPumpState = false;
@@ -111,7 +114,10 @@ void startPump() {
 
 void setup() {
   //wakeup every 10 seconds
-  esp_sleep_enable_timer_wakeup(sleeptime * uS_to_S); 
+  esp_sleep_enable_timer_wakeup(sleeptime * uS_to_S);
+
+  preferences.begin("plantid-pref", false);
+  preferences.putUInt("WateringTime", wateringTime);
   
   // Serial port for debugging
   Serial.begin(115200);
@@ -154,11 +160,31 @@ void setup() {
     request->send_P(200, "text/plain", readPumpState().c_str());
   });
 
+  server.on("/config", HTTP_POST, [](AsyncWebServerRequest *request){
+    // Check if a value with name "wateringTime" is in post request
+    if(request->hasParam("wateringTime", true)){
+        // get value of parameter
+        String newValue = request->getParam("wateringTime", true)->value();
+
+        //convert string in uint if neceassary
+        uint32_t newWateringTime = newValue.toInt();
+
+        // update preferences
+        preferences.begin("plantid-pref", false); 
+        preferences.putUInt("wateringTime", newWateringTime);
+        preferences.end();
+    } else {
+        request->send(400, "text/plain", "Bad Request");
+    }
+});
+
   // if no server is found
   server.onNotFound(notFound);
 
   // Start server
   server.begin();
+
+  preferences.end();
 
   //go to sleep
   esp_deep_sleep_start();
