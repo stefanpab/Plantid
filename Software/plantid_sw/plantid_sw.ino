@@ -46,7 +46,7 @@ void notFound(AsyncWebServerRequest *request) {
 
 void getCurrentDay() {
   int day = rtc.getDay();
-  if(hour =! currentDay) {
+  if(day != currentDay) {
     isNewDay = true;
   } else {
     isNewDay = false;
@@ -90,12 +90,13 @@ String readTemp() {
 }
 
 String readPumpState() {
-  String pumpcurrentPumpState;
+  String pumpStr;
   if(currentPumpState = true) {
-    pumpcurrentPumpState = "Pump active";
+    pumpStr = "Pump active";
   } else {
-    pumpcurrentPumpState = "Pump inactive";
+    pumpStr = "Pump inactive";
   }
+  return pumpStr;
 }
 
 void startPump() {
@@ -165,6 +166,7 @@ void setup() {
     if(request->hasParam("wateringTime", true)){
         // get value of parameter
         String newValue = request->getParam("wateringTime", true)->value();
+        newValue = newValue * 1000;
 
         //convert string in uint if neceassary
         uint32_t newWateringTime = newValue.toInt();
@@ -176,7 +178,7 @@ void setup() {
     } else {
         request->send(400, "text/plain", "Bad Request");
     }
-});
+  });
 
   // if no server is found
   server.onNotFound(notFound);

@@ -98,7 +98,7 @@
     <div class="box2">
       <h2>Change Watering Time:</h2>
       <form action="/config" method="post">
-        <input type="text" class="textInputWaterTime" id="wateringTime" name="wateringTime" placeholder="Enter watering time (ms)" pattern="[5-9]\d{3}|100000">
+        <input type="text" class="textInputWaterTime" id="wateringTime" name="wateringTime" placeholder="Enter watering time (s)" pattern="[5-9]\d{3}|100">
         <br>
         <span class="error-message" id="errorMessage"></span>
         <br>
@@ -157,7 +157,7 @@
             if (inputElement.checkValidity()) {
                 errorMessageElement.innerText = "";
             } else {
-                errorMessageElement.innerText = "Please enter a number between 5.000 and 100.000!";
+                errorMessageElement.innerText = "Please enter a number between 5 and 100!";
             }
         }
     </script>
