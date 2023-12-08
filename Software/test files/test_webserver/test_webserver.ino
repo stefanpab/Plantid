@@ -8,15 +8,7 @@ const char* ssid = "LifanHome";
 const char* password = "nexapote2620!";
 
 void notFound(AsyncWebServerRequest *request) {
-  String url = request->url();
-  int slashPos = url.indexOf("/");
-  String file = url.substring(slashPos + 1);
-  
-  if((SPIFFS.exists(file))) {
-    request->send(SPIFFS, file); 
-  } else {
     request->send(404, "text/plain", "Not found"); 
-  }
 }
 
 void setup() {
