@@ -4,7 +4,7 @@
 
 bool currentPumpState = false;
 float moisture = 0;
-float temperature = 0;
+float temperature = 0; 
 
 String readMoisture() {
   float moistvoltage = (analogRead(moisturePIN)/1024.0);
