@@ -156,11 +156,6 @@ void setup() {
   pinMode(temperaturePIN, INPUT);
   pinMode(pumpPIN, OUTPUT);
 
-  while(true) {
-   getCurrentDay();
-   startPump(); 
-  }
-
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/index.html");
@@ -198,6 +193,14 @@ void setup() {
 
   server.on("/updateWateringTime", HTTP_GET, handleUpdatePreferences);
 
+  server.on("/wateringTime", HTTP_GET, [](AsyncWebServerRequest *request){
+    preferences.begin("plantid-pref", false); 
+    uint32_t currentWateringTime = preferences.getUInt("wateringTime", wateringTime);
+    String currentWateringTimeStr = String(currentWateringTime);
+    preferences.end();
+    request->send_P(200, "text/plain", currentWateringTimeStr.c_str());
+  });
+
   // if no server is found
   server.onNotFound(notFound);
 
@@ -211,4 +214,6 @@ void setup() {
 }
 
 void loop() {
+  getCurrentDay();
+  startPump();
 }

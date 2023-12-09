@@ -77,6 +77,13 @@
       justify-content: center;
       align-items: center;
     }
+
+    .bodyBox2 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: row;
+    }
   </style>
 </head>
 <body>
@@ -95,11 +102,17 @@
         <span id='pumpStateValue'></span>
       </div>
     </div>
-    <div class="box2">
-      <label for="neuerWert">Change Watering Time:</label>
-      <input type="text" id="newValWatering" class="textInputWaterTime" name="newValWatering" placeholder="Type a number in seconds">
-      <br>
-      <button class="submitBtn" onclick="updatePreferences()">Change Value</button>
+    <div class="bodyBox2">
+      <div class="box">
+        <label>Current Watering Time: </label>
+        <span id='wateringTimeValue'></span>
+      </div>
+      <div class="box2">
+        <label for="neuerWert">Change Watering Time:</label>
+        <input type="text" id="newValWatering" class="textInputWaterTime" name="newValWatering" placeholder="Type a number in seconds">
+        <br>
+        <button class="submitBtn" onclick="updatePreferences()">Change Value</button>
+      </div>
     </div>
 
 
@@ -143,6 +156,20 @@
           }
         };
         xhttp.open('GET', 'pumpState', true);
+        xhttp.send();
+      }
+
+      setInterval(function() {
+        getWateringTime();
+      }, 3000);
+      function getWateringTime() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            document.getElementById('wateringTimeValue').innerHTML = this.responseText;
+          }
+        };
+        xhttp.open('GET', 'wateringTime', true);
         xhttp.send();
       }
 
