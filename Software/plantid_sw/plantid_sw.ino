@@ -156,6 +156,10 @@ void setup() {
   pinMode(temperaturePIN, INPUT);
   pinMode(pumpPIN, OUTPUT);
 
+  getCurrentDay();
+  startPump();
+  readPumpState();
+
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/index.html");
@@ -214,6 +218,4 @@ void setup() {
 }
 
 void loop() {
-  getCurrentDay();
-  startPump();
 }
