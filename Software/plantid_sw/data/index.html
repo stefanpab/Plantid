@@ -50,7 +50,7 @@
     .submitBtn {
       border-radius: 20px;
       background-color: white;
-      width: 35%;
+      width: 60%;
       height: 20%;
       border-color: black;
       transition: transform 0.3s;
@@ -96,21 +96,17 @@
       </div>
     </div>
     <div class="box2">
-      <h2>Change Watering Time:</h2>
-      <form action="/config" method="post">
-        <input type="text" class="textInputWaterTime" id="wateringTime" name="wateringTime" placeholder="Enter watering time (s)" pattern="[5-9]\d{3}|100">
-        <br>
-        <span class="error-message" id="errorMessage"></span>
-        <br>
-        <input class="submitBtn" type="submit" value="Save" onclick="validateInput()">
-      </form>
+      <label for="neuerWert">Change Watering Time:</label>
+      <input type="text" id="newValWatering" class="textInputWaterTime" name="newValWatering" placeholder="Type a number in seconds">
+      <br>
+      <button class="submitBtn" onclick="updatePreferences()">Change Value</button>
     </div>
 
 
     <script>
       setInterval(function() {
         getMoisture();
-      }, 10000);
+      }, 3000);
       function getMoisture() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -124,7 +120,7 @@
 
       setInterval(function() {
         getTemperature();
-      }, 10000);
+      }, 3000);
       function getTemperature() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -138,7 +134,7 @@
 
       setInterval(function() {
         getPumpState();
-      }, 10000);
+      }, 3000);
       function getPumpState() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -150,15 +146,17 @@
         xhttp.send();
       }
 
-      function validateInput() {
-            var inputElement = document.getElementById("wateringTime");
-            var errorMessageElement = document.getElementById("errorMessage");
+      function updatePreferences() {
+            var newWateringValue = document.getElementById("newValWatering").value;
 
-            if (inputElement.checkValidity()) {
-                errorMessageElement.innerText = "";
-            } else {
-                errorMessageElement.innerText = "Please enter a number between 5 and 100!";
-            }
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log("Sucessfully updated!");
+                }
+            };
+            xhr.open("GET", "/updateWateringTime?wateringVal=" + newWateringValue, true);
+            xhr.send();
         }
     </script>
 </body>

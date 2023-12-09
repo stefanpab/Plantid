@@ -13,7 +13,7 @@
 #define uS_to_S 1000000
 #define sleeptime 10
 
-RTC_DATA_ATTR uint8_t = currentDay = 0;
+RTC_DATA_ATTR uint8_t currentDay = 0;
 
 bool isNewDay = false;
 bool currentPumpState = false;
@@ -106,19 +106,33 @@ void startPump() {
     Serial.println("Pump starts watering!");
     digitalWrite(pumpPIN, HIGH);
     currentPumpState = true;
+    Serial.println(currentPumpState);
     delay(wateringTime);
     Serial.println("Pump finished watering!");
     digitalWrite(pumpPIN, LOW);
     currentPumpState = false;
+    Serial.println(currentPumpState);
   }
 }
 
-void setup() {
-  //wakeup every 10 seconds
-  esp_sleep_enable_timer_wakeup(sleeptime * uS_to_S);
+void handleUpdatePreferences(AsyncWebServerRequest *request) {
+  String newWateringTime = request->arg("wateringVal");
 
   preferences.begin("plantid-pref", false);
-  preferences.putUInt("WateringTime", wateringTime);
+  preferences.putString("wateringTime", newWateringTime);
+  preferences.end();
+
+  request->send(200, "text/plain", "Successfully updated!");
+}
+
+
+void setup() {
+  //wakeup every 10 seconds
+  //esp_sleep_enable_timer_wakeup(sleeptime * uS_to_S);
+
+  preferences.begin("plantid-pref", false);
+  String wateringTimeStr = String(wateringTime);
+  preferences.putString("WateringTime", wateringTimeStr);
   
   // Serial port for debugging
   Serial.begin(115200);
@@ -142,7 +156,10 @@ void setup() {
   pinMode(temperaturePIN, INPUT);
   pinMode(pumpPIN, OUTPUT);
 
-  getCurrentDay();
+  while(true) {
+   getCurrentDay();
+   startPump(); 
+  }
 
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -161,15 +178,14 @@ void setup() {
     request->send_P(200, "text/plain", readPumpState().c_str());
   });
 
-  server.on("/config", HTTP_POST, [](AsyncWebServerRequest *request){
+  /*server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
     // Check if a value with name "wateringTime" is in post request
     if(request->hasParam("wateringTime", true)){
         // get value of parameter
         String newValue = request->getParam("wateringTime", true)->value();
-        newValue = newValue * 1000;
 
         //convert string in uint if neceassary
-        uint32_t newWateringTime = newValue.toInt();
+        uint32_t newWateringTime = newValue.toInt() * 1000;
 
         // update preferences
         preferences.begin("plantid-pref", false); 
@@ -178,7 +194,9 @@ void setup() {
     } else {
         request->send(400, "text/plain", "Bad Request");
     }
-  });
+  });*/
+
+  server.on("/updateWateringTime", HTTP_GET, handleUpdatePreferences);
 
   // if no server is found
   server.onNotFound(notFound);
@@ -189,7 +207,7 @@ void setup() {
   preferences.end();
 
   //go to sleep
-  esp_deep_sleep_start();
+  //esp_deep_sleep_start();
 }
 
 void loop() {
