@@ -28,8 +28,8 @@ Preferences preferences;
 
 //Home
 /*
-const char* ssid = "LifanHome";
-const char* password = "nexapote2620!";*/
+  const char* ssid = "LifanHome";
+  const char* password = "nexapote2620!";*/
 
 //extern
 const char* ssid = "aat-technikum2.4GHz";
@@ -42,17 +42,17 @@ void notFound(AsyncWebServerRequest *request) {
   String url = request->url();
   int slashPos = url.indexOf("/");
   String file = url.substring(slashPos + 1);
-  
-  if((SPIFFS.exists(file))) {
-    request->send(SPIFFS, file); 
+
+  if ((SPIFFS.exists(file))) {
+    request->send(SPIFFS, file);
   } else {
-    request->send(404, "text/plain", "Not found"); 
+    request->send(404, "text/plain", "Not found");
   }
 }
 
 void getCurrentDay() {
   int day = rtc.getDay();
-  if(day != currentDay) {
+  if (day != currentDay) {
     isNewDay = true;
   } else {
     isNewDay = false;
@@ -60,15 +60,15 @@ void getCurrentDay() {
 }
 
 String readMoisture() {
-  float moistvoltage = (analogRead(moisturePIN)/1024.0);
+  float moistvoltage = (analogRead(moisturePIN) / 1024.0);
   //Serial.print("analog moist");
   //Serial.println(analogRead(moisturePIN));
-  moisture = ((moistvoltage*50.0)/3.0); //converting incoming voltage value in %
+  moisture = ((moistvoltage * 50.0) / 3.0); //converting incoming voltage value in %
   String moistureVal = String(moisture);
   /*Serial.print("float moist: ");
-  Serial.println(moisture);
-  Serial.print("String moist: ");
-  Serial.println(moistureVal);*/ 
+    Serial.println(moisture);
+    Serial.print("String moist: ");
+    Serial.println(moistureVal);*/
   if (isnan(moisture)) {
     Serial.println("Could not read any moisture value!");
     return "";
@@ -78,15 +78,15 @@ String readMoisture() {
 }
 
 String readTemp() {
-  float tempvoltage = (analogRead(temperaturePIN)/1024.0);
+  float tempvoltage = (analogRead(temperaturePIN) / 1024.0);
   //Serial.print("analog temp");
   //Serial.println(analogRead(temperaturePIN));
-  temperature = ((tempvoltage-0.5)*100.0); //converting incoming voltage value in °C
+  temperature = ((tempvoltage - 0.5) * 100.0); //converting incoming voltage value in °C
   String temperatureVal = String(temperature);
   /*Serial.print("float temp: ");
-  Serial.println(temperature);
-  Serial.print("String temp: ");
-  Serial.println(temperatureVal);*/  
+    Serial.println(temperature);
+    Serial.print("String temp: ");
+    Serial.println(temperatureVal);*/
   if (isnan(temperature)) {
     Serial.println("Could not read any temperature value!");
     return "";
@@ -97,7 +97,7 @@ String readTemp() {
 
 String readPumpState() {
   String pumpStr;
-  if(currentPumpState == true) {
+  if (currentPumpState == true) {
     pumpStr = "Pump active";
   } else {
     pumpStr = "Pump inactive";
@@ -108,8 +108,8 @@ String readPumpState() {
 void startPump() {
   delay(1000);
   digitalWrite(pumpPIN, LOW);
-  if(moisture <= threshold && isNewDay == true) {
-    currentDay = rtc.getDay(); 
+  if (moisture <= threshold && isNewDay == true) {
+    currentDay = rtc.getDay();
     Serial.println("Pump starts watering!");
     digitalWrite(pumpPIN, HIGH);
     currentPumpState = true;
@@ -140,18 +140,18 @@ void setup() {
   preferences.begin("plantid-pref", false);
   String wateringTimeStr = String(wateringTime);
   preferences.putString("WateringTime", wateringTimeStr);
-  
+
   // Serial port for debugging
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  
+
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi..");
   }
-  
+
   // Print ESP32 Local IP Address
   Serial.print("Local IP of ESP32: ");
   Serial.println(WiFi.localIP());
@@ -164,19 +164,19 @@ void setup() {
   pinMode(pumpPIN, OUTPUT);
 
   // Route for root / web page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, "/index.html");
   });
 
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send_P(200, "text/plain", readTemp().c_str());
   });
-  
-  server.on("/moisture", HTTP_GET, [](AsyncWebServerRequest *request){
+
+  server.on("/moisture", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send_P(200, "text/plain", readMoisture().c_str());
   });
 
-  server.on("/pumpState", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/pumpState", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send_P(200, "text/plain", readPumpState().c_str());
   });
 
@@ -190,18 +190,18 @@ void setup() {
         uint32_t newWateringTime = newValue.toInt() * 1000;
 
         // update preferences
-        preferences.begin("plantid-pref", false); 
+        preferences.begin("plantid-pref", false);
         preferences.putUInt("wateringTime", newWateringTime);
         preferences.end();
     } else {
         request->send(400, "text/plain", "Bad Request");
     }
-  });*/
+    });*/
 
   server.on("/updateWateringTime", HTTP_GET, handleUpdatePreferences);
 
-  server.on("/wateringTime", HTTP_GET, [](AsyncWebServerRequest *request){
-    preferences.begin("plantid-pref", false); 
+  server.on("/wateringTime", HTTP_GET, [](AsyncWebServerRequest * request) {
+    preferences.begin("plantid-pref", false);
     uint32_t currentWateringTime = preferences.getUInt("wateringTime", wateringTime);
     String currentWateringTimeStr = String(currentWateringTime);
     preferences.end();
