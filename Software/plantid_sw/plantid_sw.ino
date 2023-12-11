@@ -26,8 +26,14 @@ ESP32Time rtc(3600);  // offset in seconds GMT+1
 
 Preferences preferences;
 
+//Home
+/*
 const char* ssid = "LifanHome";
-const char* password = "nexapote2620!";
+const char* password = "nexapote2620!";*/
+
+//extern
+const char* ssid = "aat-technikum2.4GHz";
+const char* password = "2AATractive$$";
 
 float moisture = 0;
 float temperature = 0;
@@ -91,7 +97,7 @@ String readTemp() {
 
 String readPumpState() {
   String pumpStr;
-  if(currentPumpState = true) {
+  if(currentPumpState == true) {
     pumpStr = "Pump active";
   } else {
     pumpStr = "Pump inactive";
@@ -100,6 +106,7 @@ String readPumpState() {
 }
 
 void startPump() {
+  delay(1000);
   digitalWrite(pumpPIN, LOW);
   if(moisture <= threshold && isNewDay == true) {
     currentDay = rtc.getDay(); 
@@ -155,10 +162,6 @@ void setup() {
   pinMode(moisturePIN, INPUT);
   pinMode(temperaturePIN, INPUT);
   pinMode(pumpPIN, OUTPUT);
-
-  getCurrentDay();
-  startPump();
-  readPumpState();
 
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -218,4 +221,8 @@ void setup() {
 }
 
 void loop() {
+  readMoisture();
+  getCurrentDay();
+  startPump();
+  readPumpState();
 }
