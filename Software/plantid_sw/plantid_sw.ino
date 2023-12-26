@@ -122,24 +122,12 @@ void startPump() {
   }
 }
 
-void handleUpdatePreferences(AsyncWebServerRequest *request) {
-  String newWateringTime = request->arg("wateringVal");
-
-  preferences.begin("plantid-pref", false);
-  preferences.putString("wateringTime", newWateringTime);
-  preferences.end();
-
-  request->send(200, "text/plain", "Successfully updated!");
-}
-
-
 void setup() {
   //wakeup every 10 seconds
   //esp_sleep_enable_timer_wakeup(sleeptime * uS_to_S);
 
   preferences.begin("plantid-pref", false);
-  String wateringTimeStr = String(wateringTime);
-  preferences.putString("WateringTime", wateringTimeStr);
+  wateringTime = preferences.getInt("wateringTime", 10000);
 
   // Serial port for debugging
   Serial.begin(115200);
@@ -180,24 +168,7 @@ void setup() {
     request->send_P(200, "text/plain", readPumpState().c_str());
   });
 
-  /*server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
-    // Check if a value with name "wateringTime" is in post request
-    if(request->hasParam("wateringTime", true)){
-        // get value of parameter
-        String newValue = request->getParam("wateringTime", true)->value();
-
-        //convert string in uint if neceassary
-        uint32_t newWateringTime = newValue.toInt() * 1000;
-
-        // update preferences
-        preferences.begin("plantid-pref", false);
-        preferences.putUInt("wateringTime", newWateringTime);
-        preferences.end();
-    } else {
-        request->send(400, "text/plain", "Bad Request");
-    }
-    });*/
-
+/*
   server.on("/updateWateringTime", HTTP_GET, handleUpdatePreferences);
 
   server.on("/wateringTime", HTTP_GET, [](AsyncWebServerRequest * request) {
@@ -206,6 +177,27 @@ void setup() {
     String currentWateringTimeStr = String(currentWateringTime);
     preferences.end();
     request->send_P(200, "text/plain", currentWateringTimeStr.c_str());
+  });*/
+
+  //get the current watering time
+  server.on("/getWateringTime", HTTP_GET, [](AsyncWebServerRequest *request){
+    String json = "{\"wateringTime\":" + String(wateringTime) + "}";
+    request->send(200, "application/json", json);
+  });
+
+  //update the watering time
+  server.on("/updateWateringTime", HTTP_POST, [](AsyncWebServerRequest *request){
+    if(request->hasParam("wateringTime", true)){
+      int newWateringTime = request->getParam("wateringTime", true)->value().toInt();
+      wateringTime = newWateringTime;
+
+      //save it to preferences
+      preferences.putInt("wateringTime", wateringTime);
+      
+      request->send(200, "text/plain", "OK");
+    } else {
+      request->send(400, "text/plain", "Bad Request");
+    }
   });
 
   // if no server is found
@@ -215,9 +207,6 @@ void setup() {
   server.begin();
 
   preferences.end();
-
-  //go to sleep
-  //esp_deep_sleep_start();
 }
 
 void loop() {

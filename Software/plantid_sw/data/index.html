@@ -104,14 +104,14 @@
     </div>
     <div class="bodyBox2">
       <div class="box">
-        <label>Current Watering Time: </label>
-        <span id='wateringTimeValue'></span>
+        <label for="currentWateringTime">Current Watering Time: </label>
+        <span id='currentWateringTime'></span>
       </div>
       <div class="box2">
-        <label for="neuerWert">Change Watering Time:</label>
-        <input type="text" id="newValWatering" class="textInputWaterTime" name="newValWatering" placeholder="Type a number in seconds">
+        <label for="newWateringTime">Change Watering Time:</label>
+        <input type="number" id="newWateringTime" class="textInputWaterTime" name="newValWatering" placeholder="Type a number in milliseconds">
         <br>
-        <button class="submitBtn" onclick="updatePreferences()">Change Value</button>
+        <button class="submitBtn" onclick="updateWateringTime()">Change Value</button>
       </div>
     </div>
 
@@ -158,7 +158,7 @@
         xhttp.open('GET', 'pumpState', true);
         xhttp.send();
       }
-
+      /*
       setInterval(function() {
         getWateringTime();
       }, 3000);
@@ -184,7 +184,40 @@
             };
             xhr.open("GET", "/updateWateringTime?wateringVal=" + newWateringValue, true);
             xhr.send();
+        }*/
+
+    //load current watering Time
+    function getCurrentWateringTime() {
+      fetch('/getWateringTime')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('currentWateringTime').innerText = data.wateringTime + ' Milliseconds';
+          document.getElementById('newWateringTime').value = data.wateringTime;
+        });
+    }
+
+    //update watering time
+    function updateWateringTime() {
+      var newWateringTime = document.getElementById('newWateringTime').value;
+      fetch('/updateWateringTime', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'wateringTime=' + newWateringTime,
+      })
+      .then(response => response.text())
+      .then(data => {
+        if (data === 'OK') {
+          getCurrentWateringTime();
+        } else {
+          alert('Error while updating watering Time!');
         }
+      });
+    }
+
+    // initialize
+    getCurrentWateringTime();
     </script>
 </body>
 </html>
