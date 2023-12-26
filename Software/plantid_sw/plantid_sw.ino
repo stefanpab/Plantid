@@ -8,10 +8,11 @@
 #define moisturePIN 34
 #define temperaturePIN 35
 #define pumpPIN 25
-#define wateringTime 10000
 #define threshold 25.0
 #define uS_to_S 1000000
 #define sleeptime 10
+
+uint32_t wateringTime = 10000;
 
 RTC_DATA_ATTR uint8_t currentDay = 0;
 
@@ -188,7 +189,7 @@ void setup() {
   //update the watering time
   server.on("/updateWateringTime", HTTP_POST, [](AsyncWebServerRequest *request){
     if(request->hasParam("wateringTime", true)){
-      int newWateringTime = request->getParam("wateringTime", true)->value().toInt();
+      uint32_t newWateringTime = request->getParam("wateringTime", true)->value().toInt();
       wateringTime = newWateringTime;
 
       //save it to preferences
