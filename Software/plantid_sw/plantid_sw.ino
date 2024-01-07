@@ -33,8 +33,13 @@ Preferences preferences;
   const char* password = "nexapote2620!";*/
 
 //extern
+/*
 const char* ssid = "aat-technikum2.4GHz";
-const char* password = "2AATractive$$";
+const char* password = "2AATractive$$";*/
+
+//extern 2
+const char* ssid = "PabHome";
+const char* password = "12160818506533701355";
 
 float moisture = 0;
 float temperature = 0;
