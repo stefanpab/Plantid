@@ -130,8 +130,6 @@ void startPump() {
 }
 
 void setup() {
-  //wakeup every 10 seconds
-  //esp_sleep_enable_timer_wakeup(sleeptime * uS_to_S);
 
   preferences.begin("plantid-pref", false);
   wateringTime = preferences.getInt("wateringTime", 10000);
@@ -140,12 +138,13 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
 
+  /*
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi..");
-  }
+  }*/
 
   // Initialize mDNS
   if (!MDNS.begin("plantid")) {   // Set the hostname to "plantid.local"
