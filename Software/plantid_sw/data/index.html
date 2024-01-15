@@ -158,41 +158,14 @@
         xhttp.open('GET', 'pumpState', true);
         xhttp.send();
       }
-      /*
-      setInterval(function() {
-        getWateringTime();
-      }, 3000);
-      function getWateringTime() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-            document.getElementById('wateringTimeValue').innerHTML = this.responseText;
-          }
-        };
-        xhttp.open('GET', 'wateringTime', true);
-        xhttp.send();
-      }
-
-      function updatePreferences() {
-            var newWateringValue = document.getElementById("newValWatering").value;
-
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    console.log("Sucessfully updated!");
-                }
-            };
-            xhr.open("GET", "/updateWateringTime?wateringVal=" + newWateringValue, true);
-            xhr.send();
-        }*/
 
     //load current watering Time
     function getCurrentWateringTime() {
       fetch('/getWateringTime')
         .then(response => response.json())
         .then(data => {
-          document.getElementById('currentWateringTime').innerText = data.wateringTime + ' Milliseconds';
-          document.getElementById('newWateringTime').value = data.wateringTime;
+          document.getElementById('currentWateringTime').innerText = data.wateringTime/1000 + ' Seconds';
+          document.getElementById('newWateringTime').value = data.wateringTime/1000;
         });
     }
 
@@ -204,7 +177,7 @@
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'wateringTime=' + newWateringTime,
+        body: 'wateringTime=' + newWateringTime*1000,
       })
       .then(response => response.text())
       .then(data => {
