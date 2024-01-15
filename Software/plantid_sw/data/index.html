@@ -109,9 +109,12 @@
       </div>
       <div class="box2">
         <label for="newWateringTime">Change Watering Time:</label>
-        <input type="number" id="newWateringTime" class="textInputWaterTime" name="newValWatering" placeholder="Type a number in milliseconds">
+        <input type="number" id="newWateringTime" class="textInputWaterTime" name="newValWatering" placeholder="Type a number in seconds">
         <br>
         <button class="submitBtn" onclick="updateWateringTime()">Change Value</button>
+      </div>
+      <div class="box">
+        <button class="submitBtn" onclick="watering()">Press to water manuell</button>
       </div>
     </div>
 
@@ -187,6 +190,10 @@
           alert('Error while updating watering Time!');
         }
       });
+    }
+
+    function watering() {
+      var watering = document.getElementById('newWateringTime').value;
     }
 
     // initialize
