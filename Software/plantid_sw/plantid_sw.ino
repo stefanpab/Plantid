@@ -1,3 +1,15 @@
+/*
+Project:  Plantid - Automatic Watering for Plants
+Author:   Stefan Pabisch (sa21b004@technikum-wien.at)
+Date:     Created 19.04.2020 
+Version:  V1.0
+ 
+In this project it will be possible to automatically water your plants. In Addition
+to that, there will be a web gui to monitor the temperature, moisture, pump state
+and the current watering time. In the web gui it is possible to manually change the
+watering time.
+*/
+
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <SPIFFS.h>
@@ -7,48 +19,49 @@
 #include <ESPmDNS.h>
 #include <WiFiManager.h>
 
-#define moisturePIN 34
-#define temperaturePIN 35
-#define manuell_PUMP 0
-#define pumpPIN 25
-#define threshold 25.0
-#define uS_to_S 1000000
-#define sleeptime 10
+#define moisturePIN 34 // PIN for moisture value
+#define temperaturePIN 35 // PIN for temperature value
+#define manuell_PUMP 0 // ESP32 Button which manually starts the pump
+#define pumpPIN 25 // MOSFET PIN to activate pump
+#define threshold 25.0 // threshold for moisture to start watering (threshhold in prozent)
 
-uint32_t wateringTime = 10000;
-int manuell_btn_state = 0;
-int lastManuellButtonState = 0;
-uint32_t manuell_btn_pressTime = 0;
+uint32_t wateringTime = 10000; // watering time in milliseconds
+int manuell_btn_state = 0; // button state of onboard button from esp32 to start pump manually
+int lastManuellButtonState = 0; // last manuell state of button
+uint32_t manuell_btn_pressTime = 0; // time how long manuell watering button is pressed
 
-RTC_DATA_ATTR uint8_t currentDay = 0;
+RTC_DATA_ATTR uint8_t currentDay = 0; // save current day in RTC to check if it is a new day
 
-bool isNewDay = false;
-bool currentPumpState = false;
+bool isNewDay = false; 
+bool currentPumpState = false; // checks if pump is active at the moment or not
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
-//ESP32Time rtc;
+// ESP32Time rtc;
 ESP32Time rtc(3600);  // offset in seconds GMT+1
 
+// Create preferences
 Preferences preferences;
 
-  //Home
-  const char* ssid = "LifanHome";
-  const char* password = "nexapote2620!";*/
+//Home WIFI
+const char* ssid = "LifanHome";
+const char* password = "nexapote2620!";
 
-//extern
-
+//extern WIFI
 const char* ssidExt = "aat-technikum2.4GHz";
 const char* passwordExt = "2AATractive$$";
 
-float moisture = 0;
-float temperature = 0;
+float moisture = 0; // save read moisture value
+float temperature = 0; // save read temperature value
 
+/*
+ * This function handles if server cant be found.
+ */
 void notFound(AsyncWebServerRequest *request) {
-  String url = request->url();
-  int slashPos = url.indexOf("/");
-  String file = url.substring(slashPos + 1);
+  String url = request->url(); // get url 
+  int slashPos = url.indexOf("/"); // find first slash
+  String file = url.substring(slashPos + 1); // save as string everything after slash
 
   if ((SPIFFS.exists(file))) {
     request->send(SPIFFS, file);
@@ -57,6 +70,9 @@ void notFound(AsyncWebServerRequest *request) {
   }
 }
 
+/*
+ * This function is to check which day it is right now so the plants will only be watered once a day.
+ */
 void getCurrentDay() {
   int day = rtc.getDay();
   if (day != currentDay) {
@@ -66,16 +82,13 @@ void getCurrentDay() {
   }
 }
 
+/*
+ * This function is to read out the moisture from the SMT50 sensor. It will then be saved in a string which gets returned.
+ */
 String readMoisture() {
   float moistvoltage = (analogRead(moisturePIN) / 1024.0);
-  //Serial.print("analog moist");
-  //Serial.println(analogRead(moisturePIN));
   moisture = ((moistvoltage * 50.0) / 3.0); //converting incoming voltage value in %
   String moistureVal = String(moisture);
-  /*Serial.print("float moist: ");
-    Serial.println(moisture);
-    Serial.print("String moist: ");
-    Serial.println(moistureVal);*/
   if (isnan(moisture)) {
     Serial.println("Could not read any moisture value!");
     return "";
@@ -84,16 +97,13 @@ String readMoisture() {
   }
 }
 
+/*
+ * This function is to read out the temperature from the SMT50 sensor. It will then be saved in a string which gets returned.
+ */
 String readTemp() {
   float tempvoltage = (analogRead(temperaturePIN) / 1024.0);
-  //Serial.print("analog temp");
-  //Serial.println(analogRead(temperaturePIN));
   temperature = ((tempvoltage - 0.5) * 100.0); //converting incoming voltage value in °C
   String temperatureVal = String(temperature);
-  /*Serial.print("float temp: ");
-    Serial.println(temperature);
-    Serial.print("String temp: ");
-    Serial.println(temperatureVal);*/
   if (isnan(temperature)) {
     Serial.println("Could not read any temperature value!");
     return "";
@@ -102,6 +112,9 @@ String readTemp() {
   }
 }
 
+/*
+ * This function is to check in which state the pump is.
+ */
 String readPumpState() {
   String pumpStr;
   if (currentPumpState == true) {
@@ -112,6 +125,11 @@ String readPumpState() {
   return pumpStr;
 }
 
+/*
+ * This function will activate the pump and start the watering process. If the threshold from 25% is reached
+ * and not already a new day is it will start the pump for standard 10 seconds. In addition it changes the pump
+ * state during active pumping.
+ */
 void startPump() {
   delay(1000);
   digitalWrite(pumpPIN, LOW);
@@ -131,12 +149,13 @@ void startPump() {
 
 void setup() {
 
+  // Start prefernces and set a standard value for the watering time to 10 seconds
   preferences.begin("plantid-pref", false);
   wateringTime = preferences.getInt("wateringTime", 10000);
 
   // Serial port for debugging
   Serial.begin(115200);
-  WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_STA); // set wifi mode
 
   /*
   // Connect to Wi-Fi
@@ -182,6 +201,7 @@ void setup() {
   // Initialize SPIFFS
   SPIFFS.begin();
 
+  // set sensors as input and pump as output
   pinMode(moisturePIN, INPUT);
   pinMode(temperaturePIN, INPUT);
   pinMode(pumpPIN, OUTPUT);
@@ -192,36 +212,28 @@ void setup() {
     request->send(SPIFFS, "/index.html");
   });
 
+  // Route for temperature value
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send_P(200, "text/plain", readTemp().c_str());
   });
 
+  // Route for moisture value
   server.on("/moisture", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send_P(200, "text/plain", readMoisture().c_str());
   });
 
+  // Route for pump state
   server.on("/pumpState", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send_P(200, "text/plain", readPumpState().c_str());
   });
 
-/*
-  server.on("/updateWateringTime", HTTP_GET, handleUpdatePreferences);
-
-  server.on("/wateringTime", HTTP_GET, [](AsyncWebServerRequest * request) {
-    preferences.begin("plantid-pref", false);
-    uint32_t currentWateringTime = preferences.getUInt("wateringTime", wateringTime);
-    String currentWateringTimeStr = String(currentWateringTime);
-    preferences.end();
-    request->send_P(200, "text/plain", currentWateringTimeStr.c_str());
-  });*/
-
-  //get the current watering time
+  // Route to get the current watering time
   server.on("/getWateringTime", HTTP_GET, [](AsyncWebServerRequest *request){
     String json = "{\"wateringTime\":" + String(wateringTime) + "}";
     request->send(200, "application/json", json);
   });
 
-  //update the watering time
+  // Route to update the watering time
   server.on("/updateWateringTime", HTTP_POST, [](AsyncWebServerRequest *request){
     if(request->hasParam("wateringTime", true)){
       uint32_t newWateringTime = request->getParam("wateringTime", true)->value().toInt();
@@ -236,12 +248,13 @@ void setup() {
     }
   });
 
-  // if no server is found
+  // if no server is found call not found function
   server.onNotFound(notFound);
 
   // Start server
   server.begin();
 
+  // close preferences
   preferences.end();
 }
 
