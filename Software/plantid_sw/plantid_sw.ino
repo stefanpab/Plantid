@@ -17,7 +17,7 @@ watering time.
 #include <ESP32Time.h>
 #include <Preferences.h>
 #include <ESPmDNS.h>
-#include <WiFiManager.h>
+//#include <WiFiManager.h>
 
 #define moisturePIN 34 // PIN for moisture value
 #define temperaturePIN 35 // PIN for temperature value
@@ -147,6 +147,39 @@ void startPump() {
   }
 }
 
+/*
+ * This function allows to manually water the plants though a button press
+ */
+void manualWatering() {
+  // get current state of button
+  manuell_btn_state = digitalRead(manuell_PUMP);
+
+  // check if button is pressed
+  if (manuell_btn_state == HIGH && lastManuellButtonState == LOW) {
+    manuell_btn_pressTime = millis();  // save pressed time
+  }
+
+  // check if button is released
+  if (manuell_btn_state == LOW && lastManuellButtonState == HIGH) {
+    // check if the button is being pressed more then 500ms
+    if (millis() - manuell_btn_pressTime >= 500) {
+      digitalWrite(pumpPIN, HIGH); //start watering
+      Serial.println("Pump starts watering!");
+      currentPumpState = true;
+    }
+  }
+
+  // refresh last state of button
+  lastManuellButtonState = manuell_btn_state;
+
+  // check if watering ready to stop
+  if (manuell_btn_state == LOW) {
+    Serial.println("Pump finished watering!");
+    digitalWrite(pumpPIN, LOW);
+    currentPumpState = false;
+  }
+}
+
 void setup() {
 
   // Start prefernces and set a standard value for the watering time to 10 seconds
@@ -157,13 +190,13 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA); // set wifi mode
 
-  /*
+  
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi..");
-  }*/
+  }
 
   // Initialize mDNS
   if (!MDNS.begin("plantid")) {   // Set the hostname to "plantid.local"
@@ -174,6 +207,7 @@ void setup() {
   }
   Serial.println("mDNS responder started");
 
+  /*
   //intialize WifiManager
   WiFiManager wm;
 
@@ -192,7 +226,7 @@ void setup() {
   } 
     else {
       Serial.println("Connected to LifanHome");
-  }
+  }*/
 
   // Print ESP32 Local IP Address
   Serial.print("Local IP of ESP32: ");
@@ -263,32 +297,5 @@ void loop() {
   getCurrentDay();
   startPump();
   readPumpState();
-
-  // get current state of button
-  manuellButtonState = digitalRead(manuell_PUMP);
-
-  // check if button is pressed
-  if (manuellButtonState == HIGH && lastManuellButtonState == LOW) {
-    manuell_btn_pressTime = millis();  // save pressed time
-  }
-
-  // check if button is released
-  if (manuellButtonState == LOW && lastManuellButtonState == HIGH) {
-    // check if the button is being pressed more then 500ms
-    if (millis() - manuell_btn_pressTime >= 500) {
-      digitalWrite(pumpPIN, HIGH); //start watering
-      Serial.println("Pump starts watering!");
-      currentPumpState = true;
-    }
-  }
-
-  // refresh last state of button
-  lastManuellButtonState = manuellButtonState;
-
-  // check if watering ready to stop
-  if (manuellButtonState == LOW) {
-    Serial.println("Pump finished watering!");
-    digitalWrite(pumpPIN, LOW);
-    currentPumpState = false;
-  }
+  manualWatering();
 }
