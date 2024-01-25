@@ -57,3 +57,6 @@ pressing the "Change value" button.
 Fill the tank with water but fill it no higher than the plant pot to avoid that the water won't stop floating after watering. Plant your plants into the 
 pot and place the moisture sensor in the pot. For the best results from the sensor, bury the sensor as deep as possible under the plants. Scew the PCB into
 the 3D case and connect the pump, sensor and battery to the pcb. Close the PCB and plug the pipes into the pump and the water tank.
+
+# Support
+If you run into any problems or have any questions regarding the project, feel free to message me under my email: sa21b004@technikum-wien.at
