@@ -4,7 +4,8 @@ Plantid is a automatic watering system which works according the micro drip prin
 With the help of a PVC-pipe the water will be transported to the water sprinklers - which are in the earth next to the plants. The amount of water 
 coming out of the sprinkler can be adjusted by turning the head. In addition there is a web application which monitors moisture level, temperature,
 the state of the pump and the current watering time. The standard watering time is 10 seconds but can always be changed manually by the user in the
-web application.
+web application. The watering system will start watering if the moisture value drops under 25% and will only water once a day to avoid overwatering 
+the plant. In addition you can press the "EN" button to water manually. It will be watered as long as you press the button.
 
 ![Plants placed in the box](https://github.com/stefanpab/Plantid/blob/main/img/Plantid_Plants.jpeg "Plants placed in the box")
 
@@ -43,4 +44,16 @@ Plug in a micro USB cable into the ESP32 and into your computer. Now go to "tool
 now have to press the boot button for two seconds. After you get the message "Done uploading" in the arduino console, the index.html is 
 successfully be uploaded. Now you have to upload the code. Click on tools and apply following settings:
 ![Arduino code upload settings](https://github.com/stefanpab/Plantid/blob/main/img/Arduino_CodeUpload.png "Arduino code upload settings")
-Most important are Port and Board. Select "ESP32 Dev Module" as board and for the port the correct one where your ESP32 is plugged in.
+Most important are Port and Board. Select "ESP32 Dev Module" as board and for the port the correct one where your ESP32 is plugged in. After selecting
+the correct settings press the upload button (button in the red rectangle). In most cases it can be necassary to press the boot button again to 
+successfully upload the code. After uploading the Code you can plug out the micro USB cable and screw the battery wires into the screw clamp.
+
+### Web GUI
+Now after uploading everything you can open the web gui by entering "plantid.local" in any internet explorer. You will now be able to see the current 
+values of the watering system. In addition you can manually change the watering time by entering your needed time in seconds and confirming that by
+pressing the "Change value" button.
+
+### Hardware
+Fill the tank with water but fill it no higher than the plant pot to avoid that the water won't stop floating after watering. Plant your plants into the 
+pot and place the moisture sensor in the pot. For the best results from the sensor, bury the sensor as deep as possible under the plants. Scew the PCB into
+the 3D case and connect the pump, sensor and battery to the pcb. Close the PCB and plug the pipes into the pump and the water tank.
