@@ -41,4 +41,6 @@ home wife name and password. In addition you can open /Software/plantid_sw/data/
 removing for example the pump state to be seen on the web gui. After finishing the editing of those files, go back to the Arduino Software.
 Plug in a micro USB cable into the ESP32 and into your computer. Now go to "tools" and press the "ESP32 Sketch Data Upload" button. In most cases you 
 now have to press the boot button for two seconds. After you get the message "Done uploading" in the arduino console, the index.html is 
-successfully be uploaded. Now you have to upload the code. 
+successfully be uploaded. Now you have to upload the code. Click on tools and apply following settings:
+![Arduino code upload settings](https://github.com/stefanpab/Plantid/blob/main/img/Arduino_CodeUpload.png "Arduino code upload settings")
+Most important are Port and Board. Select "ESP32 Dev Module" as board and for the port the correct one where your ESP32 is plugged in.
