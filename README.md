@@ -25,15 +25,20 @@ upload manager you need for the project is not supported yet. You can Download i
 
 ### Arduino IDE additional managers
 In addtion you need to download the file upload manager for esp32. 
-1) Download following zip package: https://github.com/me-no-dev/arduino-esp32fs-plugin/releases/
+1) Download ESP32FS-1.1 zip package: https://github.com/me-no-dev/arduino-esp32fs-plugin/releases/
 2) You need to know your sketchbook location from your Arduino IDE. To find that, open the Arduino IDE and go to "File->Preferences"
+![Arduino Preferences](https://github.com/stefanpab/Plantid/blob/main/img/Preferences_Arduino.png "Arduino Preferences")
 3) Go to the sketchbook location in your explorer and create a folder namened "tools"
+![Arduino exlporer](https://github.com/stefanpab/Plantid/blob/main/img/Arduino_exlorer.png "Arduino explorer")
 4) Unzip the downloaded package and paste it into the tools folder
 5) Restart the Arduino IDE
 6) Now you will find under "Tools" the "ESP32 Sketch Data Upload" button
 
 ### Code adjustments
-To edit the arduino code now, you have to open the /Software/plantid_sw/plantid_sw.ino file. 
+To edit the arduino code, you have to open the /Software/plantid_sw/plantid_sw.ino file. 
 You can make several changes in this file which best fits for your usecase. At line 48 and 49 you have to replace those wifi credentials with your 
 home wife name and password. In addition you can open /Software/plantid_sw/data/index.html to change the web application. You can change the CSS, or 
 removing for example the pump state to be seen on the web gui. After finishing the editing of those files, go back to the Arduino Software.
+Plug in a micro USB cable into the ESP32 and into your computer. Now go to "tools" and press the "ESP32 Sketch Data Upload" button. In most cases you 
+now have to press the boot button for two seconds. After you get the message "Done uploading" in the arduino console, the index.html is 
+successfully be uploaded. Now you have to upload the code. 
