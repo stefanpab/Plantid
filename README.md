@@ -35,6 +35,10 @@ In addtion you need to download the file upload manager for esp32.
 5) Restart the Arduino IDE
 6) Now you will find under "Tools" the "ESP32 Sketch Data Upload" button
 
+### Arduino IDE additional libraries
+To make the project work you need to install some additional librarys. To install them click on Sketch->Include Library->Manage Libraries
+Search for "ESP32Time" and press on install for following:
+
 ### Code adjustments
 To edit the arduino code, you have to open the /Software/plantid_sw/plantid_sw.ino file. 
 You can make several changes in this file which best fits for your usecase. At line 48 and 49 you have to replace those wifi credentials with your 
@@ -52,6 +56,7 @@ successfully upload the code. After uploading the Code you can plug out the micr
 Now after uploading everything you can open the web gui by entering "plantid.local" in any internet explorer. You will now be able to see the current 
 values of the watering system. In addition you can manually change the watering time by entering your needed time in seconds and confirming that by
 pressing the "Change value" button.
+![WEB GUI Plantid](https://github.com/stefanpab/Plantid/blob/main/img/Plantid_WEBgui.png "WEB GUI Plantid")
 
 ### Hardware
 Fill the tank with water but fill it no higher than the plant pot to avoid that the water won't stop floating after watering. Plant your plants into the 
