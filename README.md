@@ -44,7 +44,7 @@ Click on following button:
 ![ESP32 Additional Libraries](https://github.com/stefanpab/Plantid/blob/main/img/Preferences_Arduino_Libraries.png "ESP32 Additional Libraries")
 Paste then the following line into it and press ok. With that line you will install the the AsyncTCP and the AsynchWebServer which are 
 necassary to build the asynchrouns webserver.
-https://github.com/me-no-dev/ESPAsyncWebServer; https://github.com/me-no-dev/AsyncTCP
+"https://github.com/me-no-dev/ESPAsyncWebServer; https://github.com/me-no-dev/AsyncTCP"
 
 ### Code adjustments
 To edit the arduino code, you have to open the /Software/plantid_sw/plantid_sw.ino file. 
