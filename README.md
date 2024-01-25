@@ -52,6 +52,7 @@ successfully upload the code. After uploading the Code you can plug out the micr
 Now after uploading everything you can open the web gui by entering "plantid.local" in any internet explorer. You will now be able to see the current 
 values of the watering system. In addition you can manually change the watering time by entering your needed time in seconds and confirming that by
 pressing the "Change value" button.
+![WEB GUI Plantid](https://github.com/stefanpab/Plantid/blob/main/img/Plantid_WEBgui.png "WEB GUI Plantid")
 
 ### Hardware
 Fill the tank with water but fill it no higher than the plant pot to avoid that the water won't stop floating after watering. Plant your plants into the 
