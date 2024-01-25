@@ -35,6 +35,10 @@ In addtion you need to download the file upload manager for esp32.
 5) Restart the Arduino IDE
 6) Now you will find under "Tools" the "ESP32 Sketch Data Upload" button
 
+### Arduino IDE additional libraries
+To make the project work you need to install some additional librarys. To install them click on Sketch->Include Library->Manage Libraries
+Search for "ESP32Time" and press on install for following:
+
 ### Code adjustments
 To edit the arduino code, you have to open the /Software/plantid_sw/plantid_sw.ino file. 
 You can make several changes in this file which best fits for your usecase. At line 48 and 49 you have to replace those wifi credentials with your 
