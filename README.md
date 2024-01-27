@@ -7,7 +7,7 @@ the state of the pump and the current watering time. The standard watering time 
 web application. The watering system will start watering if the moisture value drops under 25% and will only water once a day to avoid overwatering 
 the plant. In addition you can press the "EN" button to water manually. It will be watered as long as you press the button.
 
-
+![Plants placed in the box](https://github.com/stefanpab/Plantid/blob/main/img/Plantid_PlantsBox.jpeg "Plants placed in the box")
 
 ## Content of the folders in this repo
 The folders containing following information:
