@@ -71,7 +71,9 @@ pot and place the moisture sensor in the pot. For the best results from the sens
 the 3D case and connect the pump, sensor and battery to the pcb. Close the PCB and plug the pipes into the pump and the water tank.
 
 ## Documentation
-In the documentation folder you can find the ibom file. This file shows you an interactive instruction how to solder the pcb with which components. In addition you have the components list as an csv file to know the order number of the required parts. Also you can find the circuit diagram, so you dont have to download KiCad to have a look at it.
+In the documentation folder you can find the ibom file. This file shows you an interactive instruction how to solder the pcb with which components. In 
+addition you have the components list as an csv file to know the order number of the required parts. Also you can find the circuit diagram, so you dont have 
+to download KiCad to have a look at it. Last but not least you will also find the block diagram in there.
 
 # Support
 If you run into any problems or have any questions regarding the project, feel free to message me under my email: sa21b004@technikum-wien.at
